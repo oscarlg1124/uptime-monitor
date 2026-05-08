@@ -24,6 +24,9 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+jwt:
+  secret: IS6Nw6Kij+gKuVR5IvD1prm9cqepNvNrcc59uXzJORg0BqV9Pr6C28yniEGt4mnr15Y+6Zmm24J3Miy1jnMQpg==
+
 server:
   port: 8080
 
@@ -47,6 +50,9 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+jwt:
+  secret: ${JWT_SECRET}
 
 server:
   port: ${PORT:8080}
