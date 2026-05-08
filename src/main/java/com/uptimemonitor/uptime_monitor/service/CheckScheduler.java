@@ -7,6 +7,7 @@ import com.uptimemonitor.uptime_monitor.repository.MonitorRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -30,6 +31,7 @@ public class CheckScheduler {
     }
 
     @Scheduled(fixedDelay = 60000)
+    @Transactional
     public void runChecks() {
         Instant now = Instant.now();
 
@@ -49,7 +51,8 @@ public class CheckScheduler {
             Monitor.Status previousStatus = monitor.getStatus();
             Monitor.Status newStatus = result.isUp() ? Monitor.Status.UP : Monitor.Status.DOWN;
 
-            if (previousStatus == Monitor.Status.UP && newStatus == Monitor.Status.DOWN) {
+            if (newStatus == Monitor.Status.DOWN
+                    && (previousStatus == Monitor.Status.UP || previousStatus == Monitor.Status.PENDING)) {
                 alertService.sendDownAlert(monitor);
             } else if (previousStatus == Monitor.Status.DOWN && newStatus == Monitor.Status.UP) {
                 alertService.sendUpAlert(monitor);
@@ -59,7 +62,7 @@ public class CheckScheduler {
             monitor.setLastCheckedAt(now);
             monitorRepository.save(monitor);
 
-            log.info("Checked {} → {} in {}ms", monitor.getName(), newStatus, result.responseTimeMs());
+            log.info("Checked {} → {} (was {}) in {}ms", monitor.getName(), newStatus, previousStatus, result.responseTimeMs());
         }
     }
 
