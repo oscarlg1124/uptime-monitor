@@ -23,6 +23,7 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    repair-on-migrate: true
   mail:
     host: smtp.resend.com
     port: 465
@@ -82,7 +83,7 @@ jwt:
 
 app:
   mail:
-    from: alerts@tudominio.com
+    from: onboarding@resend.dev
 
 server:
   port: ${PORT:8080}
